@@ -71,7 +71,7 @@ Based on this analysis, I created an 'adults_per_room' feature that could potent
 
 The heatmap shows a non-uniform distribution of hotel clusters across different continents:
 - Certain hotel clusters (e.g., 3, 57, 66) show stronger representation in posa_continent 0
-- Some clusters (e.g., 90) appear more strongly associated with posa_continent 3
+- Some clusters (e.g., 9, 45, 63) appear more strongly associated with posa_continent 4
 
 #### Statistical validation:
 - The chi-square test confirms a statistically significant association between hotel_cluster and posa_continent
@@ -81,9 +81,9 @@ The heatmap shows a non-uniform distribution of hotel clusters across different 
 ![Hotel Cluster Distribution by Top Sites](https://github.com/OlidiaTL/Expedia/blob/main/sitename_cluster.png?raw=true)
 
 The heatmap reveals varied distribution patterns:
-- Certain site_names (e.g., 11, 60, 90) show strong associations with specific hotel clusters
-- Site_name 23 shows notable associations with clusters 36, 63, and 84
-- Site_name 24 shows stronger associations with clusters 45 and 84
+- Certain site_names (e.g., 18, 23, 24) show strong associations with specific hotel clusters
+- Site_name 18 shows notable associations with clusters 12, 36, and 62
+- Site_name 23 shows stronger associations with clusters 30 and 82
 
 #### Statistical validation:
 - The chi-square test confirms a statistically significant association
@@ -97,7 +97,28 @@ The heatmap reveals varied distribution patterns:
 ### 5. Room and Adult Count Analysis
 
 ![Hotel Cluster Distribution by Room Count](https://github.com/OlidiaTL/Expedia/blob/main/roomcnt_cluster.png?raw=true)
+
+The room count heatmap reveals distinct patterns across hotel clusters:
+
+- **Higher room counts (4+)**: Clusters 16, 48, 81, and 91 show notably stronger associations with bookings of 4+ rooms, suggesting these clusters likely represent destinations popular for larger groups or families.
+
+- **Single room preferences**: Clusters 41, 48 and 91 show a strong association with single-room bookings, indicating these may represent destinations popular with solo travelers or couples.
+
+- **Mid-size accommodations**: Clusters 12, 40, 42,91 and 98 demonstrate stronger associations with 3-room bookings, suggesting they may represent destinations appealing to medium-sized groups.
+
+- **Balanced distributions**: Many clusters (particularly in the 20-40 range) show a more even distribution across different room counts, suggesting these represent more versatile destinations that accommodate various group sizes.
+
 ![Hotel Cluster Distribution by Adult Count](https://github.com/OlidiaTL/Expedia/blob/main/adultcnt_cluster.png?raw=true)
+
+Analyzing the adult count heatmap reveals interesting patterns:
+
+- **Large group bookings (6-10 adults)**: Clusters 12, 65, 85, and 91 show notably stronger preferences for large group bookings. This suggests these clusters likely represent destinations that cater to conferences, retreats, or large family gatherings.
+
+- **Solo traveler patterns**: Clusters 48 and 91 display heightened activity for single-adult bookings, indicating these may be popular business travel destinations or locations appealing to solo tourists.
+
+- **Couple and small family bookings**: Many clusters show stronger associations with the 2-3 adult range, which is expected as this represents the typical family or couple travel arrangement. Clusters 18, 21, and 72 are particularly noteworthy here.
+
+- **Consistent large family preference**: Cluster 91 shows strong association across multiple adult count categories, suggesting it might represent versatile destinations that accommodate various group sizes, from solo travelers to large groups.
 
 #### Statistical Analysis:
 1. **Significant variation in mean room counts**: The ANOVA test demonstrates that the average number of rooms booked varies significantly across different hotel clusters (p-value: 2.56e-49). This indicates that certain hotel clusters consistently attract bookings with higher or lower room counts than others.
@@ -106,11 +127,6 @@ The heatmap reveals varied distribution patterns:
 
 #### Implications for modeling:
 1. These features should be included in predictive models despite not showing strong linear correlations with hotel_cluster in our initial analysis.
-2. Feature engineering opportunities include: 
-   - Creating adults-per-room ratio features
-   - Categorizing bookings into size groups (solo, couple, family, large group)
-   - Interaction terms between these features and other predictors
-3. Models capable of capturing non-linear relationships (like random forests or gradient boosting) would likely better utilize these features than linear models
 
 ### 6. Temporal Patterns
 
@@ -127,13 +143,12 @@ We created several time-based features from the check-in (srch_ci) and check-out
 The heatmap reveals several significant temporal patterns:
 1. **Seasonal Preferences by Cluster**: 
    - Certain months show stronger preferences for specific hotel clusters
-   - Month 9 (September) shows particularly strong preferences for clusters 28 and 50 (bright yellow spots)
+   - Month 9 (September) shows particularly strong preferences for clusters 27, 52 and 74 (bright yellow spots)
    - Month 8 (August) shows elevated booking rates across many clusters
-   - Month 12 (December) shows increased activity across most clusters, particularly 90-96
+   - Month 12 (December) shows increased activity across most clusters
 2. **Year-Round vs. Seasonal Clusters**: 
    - Some hotel clusters maintain relatively consistent booking patterns throughout the year
    - Others show strong seasonal variation, with clear high and low seasons
-   - Clusters in the 20-30 range show more pronounced seasonal patterns
 3. **Off-Season Patterns**: 
    - Certain clusters that are popular in summer months show reduced activity in winter months
    - This suggests some clusters may represent seasonal destinations (e.g., beach resorts, ski resorts)
@@ -143,27 +158,76 @@ The heatmap reveals several significant temporal patterns:
 2. The seasonality patterns likely reflect different types of destinations - some being year-round destinations while others are highly seasonal.
 3. December (month 12) shows higher activity across most clusters, likely reflecting holiday travel patterns.
 
-### 6. Categorical Feature Analysis
+### 7. Non-linear Relationships with Hotel Cluster
 
-Our analysis of categorical features revealed significant associations with hotel_cluster:
+To investigate non-linear relationships between numerical features and hotel clusters, I analyzed the average values and distributions of key numerical features across different hotel clusters.
 
-#### Key Findings by Feature:
-1. **Site Name (site_name)**: 
-   - Different site names show strong preferences for particular hotel clusters
-   - Site 2 predominantly directs to clusters 91, 41, and 48
-   - Each site appears to have distinct cluster preferences, suggesting regional specialization
-2. **Point of Sale Continent (posa_continent)**: 
-   - Continent 3 shows strong association with clusters 91, 41, and 48
-   - Continent 1 users typically book clusters 64, 46, and 82
-   - The continental origin of bookings is highly predictive of hotel cluster
-3. **User Location Country (user_location_country)**: 
-   - Country 66 strongly favors clusters 91, 41, and 48
-   - Different countries show distinct hotel cluster preferences
-   - This suggests travelers from different countries have strong destination preferences
-4. **Package Booking (is_package)**: 
-   - Non-package bookings favor clusters 91, 48, and 41
-   - Package bookings show distinctly different preferences: clusters 65, 52, and 64
-   - This represents one of the clearest differentiators among categorical features
+![Numerical Features Mean by Hotel Cluster](https://github.com/OlidiaTL/Expedia/blob/main/orig_cluster.png?raw=true)
+
+#### Analysis of Average Values Across Hotel Clusters
+
+The bar charts reveal several important patterns:
+
+1. **Origin-Destination Distance**: 
+   - Substantial variation in average distances exists across hotel clusters
+   - Several clusters (8, 46, 67, and 70) show distinctly higher average distances (>4000 units)
+   - Cluster 46 has the highest average distance at over 5000 units
+   - Other clusters (like 18, 45, 50, and 94) consistently show shorter average distances (<1500 units)
+   - This suggests certain hotel clusters represent long-distance destinations while others are more local/regional
+
+2. **Adult Count Patterns**: 
+   - The adult count shows subtle but consistent differences across clusters
+   - Most clusters have average adult counts between 1.8-2.2
+   - Cluster 71 stands out with the highest average adult count (around 2.4)
+   - Clusters 62-74 generally show higher adult counts compared to other ranges
+
+3. **Children Count Variation**:
+   - More pronounced differences appear in children counts across clusters
+   - Cluster 71 shows a dramatic spike with an average of over 0.8 children per booking
+   - Clusters 30-35 also show elevated children counts
+   - This suggests certain clusters specifically cater to family travel with children
+
+4. **Room Count Consistency**:
+   - Room counts show less dramatic variation but still have cluster-specific patterns
+   - Most clusters maintain averages between 1.0-1.2 rooms
+
+5. **Click Count (cnt) Feature**:
+   - Cluster 66 shows the highest average click count at over 2.0
+   - Clusters 45, and 46 also show elevated click counts
+   - This could indicate destinations that require more research before booking
+
+#### Distribution Analysis (Box Plots)
+
+![Numerical Features Distribution by Hotel Cluster](https://github.com/OlidiaTL/Expedia/blob/main/cluster_orig2.png?raw=true)
+
+The box plots provide additional insights beyond averages:
+
+1. **High Variability in Distance**:
+   - The origin-destination distance shows extreme variability within clusters
+   - Many outliers (circles) indicate long-distance bookings within otherwise local-focused clusters
+   - Clusters in the 55-70 range show both higher medians and wider distributions
+   - Some clusters like 40-50 have primarily short distances with occasional long-distance outliers
+
+2. **Discrete Nature of Booking Features**:
+   - Adult, children, and room counts show distinct "banding" patterns due to their discrete nature
+   - For adult counts, the majority of bookings across all clusters center around 2 adults
+   - Children count distributions show most bookings have 0 children, with occasional outliers
+   - Room counts similarly cluster around 1 room across most hotel clusters
+
+3. **Click Count Outliers**:
+   - The cnt feature shows considerable outliers across all clusters
+   - Some bookings require 15-20+ clicks, while the majority need fewer than 5
+   - This suggests a small subset of users who conduct extensive research before booking
+
+#### Key Insights:
+1. Different hotel clusters capture meaningful patterns in traveler behavior and preferences that aren't apparent from simple correlation analysis
+2. Distance is the strongest differentiator between clusters, with clear patterns of regional versus long-distance destinations
+3. The existence of significant outliers in all features suggests that while clusters have general tendencies, they accommodate diverse booking patterns
+4. These numerical features show clear non-linear relationships with hotel clusters that would be valuable in predictive models
+
+This analysis reinforces that despite weak linear correlations, numerical features contain valuable predictive information when examined through the lens of non-linear relationships and cluster-specific patterns.
+
+### 8. Categorical Feature Analysis
 
 #### Chi-Square Test Results:
 The chi-square tests demonstrate statistically significant relationships between all categorical features and hotel_cluster:
@@ -174,7 +238,7 @@ The chi-square tests demonstrate statistically significant relationships between
 - Booking characteristics (site_name, posa_continent, is_package) show moderate association
 - Device and channel characteristics (is_mobile, channel) show the weakest, though still significant, relationships
 
-### 7. Feature Importance Analysis
+### 9. Feature Importance Analysis
 
 ![Decision Tree for Hotel Cluster Prediction](https://github.com/OlidiaTL/Expedia/blob/main/decision_tree.png?raw=true)
 
@@ -223,7 +287,7 @@ This project provides valuable insights for travel booking platforms looking to 
 
 The full Jupyter notebook with detailed code and additional visualizations is available:
 
-[View this analysis in nbviewer](https://nbviewer.org/github/yourusername/yourrepository/blob/main/Expedia.ipynb)
+[View this analysis in nbviewer](https://nbviewer.org/github/OlidiaTL/Expedia/blob/main/Expedia.ipynb)
 
 ## Image Credits
 
