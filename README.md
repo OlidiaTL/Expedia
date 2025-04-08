@@ -7,64 +7,96 @@ This project analyzes hotel booking data to predict which hotel cluster a user i
 
 ### 1. Initial Correlation Analysis
 
-![Correlation Heatmap](https://github.com/OlidiaTL/Expedia/blob/main/correlation_matrix.png?raw=true)
+![CorrelationMatrix](https://github.com/OlidiaTL/Expedia/blob/main/matrix.png?raw=true)
 
-#### Key Finding 1: No strong linear correlations with target variable
-- The correlation analysis revealed no significant linear relationships between hotel_cluster (our target variable) and any other features in the dataset.
-- This suggests that linear models alone might not be sufficient to capture the relationships in this data.
+Strong positive correlation between srch_adults_cnt and srch_rm_cnt (0.52): This is the most significant relationship in the matrix, indicating that as the number of adults increases, travelers tend to book more rooms. This moderate correlation suggests a clear pattern in booking behavior.
 
-#### Key Finding 2: Strong correlations between features
-- Strong negative correlation (-0.767) between posa_continent and site_name 
-- This indicates that specific point-of-sale sites are strongly associated with particular continents
-- This relationship makes intuitive sense as users often use region-specific Expedia sites
+Weak positive correlation between srch_adults_cnt and srch_children_cnt (0.12): There's a slight tendency for bookings with more adults to also include more children, though this relationship is quite weak.
+Weak positive correlation between srch_children_cnt and srch_rm_cnt (0.09): The number of children has a small but positive relationship with the number of rooms booked.
 
-#### Key Finding 3: Moderate correlation between room and adult counts
-- Moderate positive correlation (0.521) between srch_rm_cnt (number of rooms) and srch_adults_cnt (number of adults) 
-- This is expected as larger groups typically require more rooms
- 
-Since the target variable doesn't show strong linear correlations with individual features, we should explore non-linear relationships
+Minimal correlation between orig_destination_distance and other variables: The physical distance between hotels and customers shows very weak negative correlations with the number of adults (-0.06), children (-0.07), and rooms (-0.04), suggesting distance has little influence on party size.
 
-### 2. Continent and Site Relationship Analysis
+Negligible correlation between cnt (number of similar events) and all other variables: This suggests that the frequency of similar session events doesn't meaningfully relate to the booking characteristics.
 
-![Relationship Between posa_continent and site_name](https://github.com/OlidiaTL/Expedia/blob/main/continent_sitename.png?raw=true)
+Absence of multicollinearity: Besides the adults-rooms relationship, there are no other strong correlations between features, which is favorable for potential predictive modeling as it reduces redundancy in the feature set.
 
-#### Key Finding: Clear geographical site specialization
-The heatmap reveals a strong pattern of geographical specialization among Expedia's sites:
-- posa_continent = 3 shows a very strong association with site_name = 2, indicating that this point of sale is heavily dominant for a specific continent (likely North America based on Expedia's business structure)
-- posa_continent = 1 shows moderate associations with multiple site_names, but has notable presence with site_names 13 and 37
-- There is very minimal overlap between sites serving different continents, confirming the strong negative correlation (-0.767) found earlier
+These findings suggest that the number of adults is the primary driver of room bookings, while other numerical variables show minimal relationships with each other.RetryClaude can make mistakes. Please double-check responses.
 
-#### Statistical validation:
-- p-value of 0.0: This extremely low p-value indicates that the relationship between posa_continent and site_name is statistically significant.
-- Cramer's V of 0.9998: This measure of association ranges from 0 (no association) to 1 (perfect association). The value of 0.9998 indicates an almost perfect association between posa_continent and site_name.
-
-#### Implications for modeling:
-1. These two features provide redundant information, suggesting we could potentially drop one without losing predictive power
-2. The clear separation suggests regional preferences may be important for predicting hotel clusters
-
-### 3. Relationship Between Room and Adult Counts
+### 2. Relationship Between Room and Adult Counts
 
 ![Relationship Between Number of Adults and Number of Rooms](https://github.com/OlidiaTL/Expedia/blob/main/srchrm_srchadults.png?raw=true)
 ![Distribution of Adults per Room](https://github.com/OlidiaTL/Expedia/blob/main/adultscnt_srchrmcnt.png?raw=true)
 
-#### Correlation Analysis:
-To verify the correlation between the number of adults and number of rooms booked, I conducted both visual and statistical analyses:
+## Correlation Analysis and Statistical Testing
 
+### Initial Correlation Matrix
+The correlation matrix of numerical variables revealed only one moderate correlation between `srch_adults_cnt` and `srch_rm_cnt` (0.52). Other variables showed minimal correlation with each other, indicating low multicollinearity in the feature set.
+
+### Correlation Analysis
+To verify the correlation between the number of adults and number of rooms booked, I conducted both visual and statistical analyses:
 - The scatter plot shows a clear positive relationship between the number of adults and rooms
 - The histogram of adults per room shows that most bookings have 1-2 adults per room, with the highest frequency around 2 adults per room
-
 - **Pearson correlation of 0.5206**: This indicates a moderate positive linear relationship between number of adults and number of rooms.
 - **Spearman correlation of 0.4415**: The slightly lower Spearman coefficient suggests that the relationship has some non-linear components or contains outliers.
+- **Test selection rationale**: I used Pearson correlation to measure the linear relationship, while Spearman rank correlation provided a complementary non-parametric perspective that's more robust against outliers and doesn't assume linearity. Using both tests strengthens our confidence in the relationship, as they measure different aspects of correlation.
 - **p-values of 0.0000000000**: The extremely low p-values for both tests confirm that the correlation is statistically significant and not due to random chance.
 - **R² of 0.2710**: This means that 27.1% of the variance in one variable is explained by the other. While significant, this also indicates that the variables contain substantial unique information not captured by the other.
 
-#### Interpretation:
-These statistical results confirm our visual observations - there is a moderate but highly significant positive relationship between the number of adults and rooms. The R² value suggests that while these variables are related, they each still contain unique information that could be valuable for predicting hotel_cluster.
+### Categorical Analysis
+I performed categorical analysis on the relationship between adults and rooms using cross-tabulation:
+- **Cross-tabulation results**: The contingency table revealed specific booking patterns, such as 98% of 2-adult bookings requesting a single room, while 65% of 4-adult bookings request two rooms.
+- **Chi-square test**: With a chi-square statistic of 106,837.68 (p < 0.0000000001), we can conclusively reject the null hypothesis of independence between these variables.
+- **Conditional probability analysis**: The heatmap of conditional probabilities showed a clear diagonal trend, confirming that as the number of adults increases, travelers tend to book more rooms in a predictable pattern.
 
-#### Feature Engineering Implications:
-Based on this analysis, I created an 'adults_per_room' feature that could potentially capture booking patterns more effectively than the individual features alone.
+### Relationship with Hotel Clusters
+To understand how room and adult counts relate to our target variable:
+- **Created categorical bins** for room count and adult count to improve visualization
+- **Cross-tabulation heatmaps** showed distinct preferences for certain hotel clusters based on group size
+- **ANOVA tests**: Confirmed statistically significant differences in mean room counts and adult counts across hotel clusters (p < 0.05)
 
-### 4. Hotel Cluster Analysis
+### Temporal Analysis
+I examined temporal patterns by creating derived features:
+- Trip duration (stay length)
+- Check-in month and day of week
+- Weekend vs. weekday patterns
+- Seasonal preferences by hotel cluster
+
+The ANOVA test confirmed significant differences in trip duration across hotel clusters (p < 0.05), indicating that different hotel clusters cater to different types of stays.
+
+### Systematic Chi-Square Testing
+I developed a function to systematically test all categorical features:
+- Ranked all categorical features by chi-square value to identify strongest predictors
+- Found that location-based features (`hotel_country`, `hotel_market`) and search features (`srch_destination_id`) had the strongest associations with hotel clusters
+- These results provided a data-driven approach to feature selection
+
+![Frequncy](https://github.com/OlidiaTL/Expedia/blob/main/frequency_adltvsroom.png?raw=true)
+![Probability](https://github.com/OlidiaTL/Expedia/blob/main/probability.png?raw=true)
+
+### Cross-Tabulation Analysis of Adults and Rooms
+
+I performed a detailed cross-tabulation analysis of the relationship between number of adults and number of rooms to understand booking patterns:
+
+#### Key Findings from Frequency Analysis:
+- **Most common booking pattern**: 2 adults in 1 room (64,927 bookings), representing the typical couple or business travel scenario
+- **Second most common**: 1 adult in 1 room (19,935 bookings), typical of solo travelers
+- **Group travel patterns**: As group size increases (4+ adults), the distribution shifts toward multiple rooms
+- **Unusual bookings**: Some unusual combinations exist, such as 8 adults in 8 rooms or 0 adults with rooms booked
+
+#### Probability Analysis:
+- **Solo travelers (1 adult)**: 99% book exactly 1 room
+- **Couples (2 adults)**: 98% book 1 room, 2% book 2 rooms
+- **Small groups (3 adults)**: 72% book 1 room, 23% book 2 rooms, 4% book 3 rooms
+- **Medium groups (4 adults)**: Booking pattern shifts - 32% book 1 room, 65% book 2 rooms
+- **Large groups (6+ adults)**: Show increasing preference for 3+ rooms
+  * 6 adults: 59% book 3 rooms
+  * 8 adults: 48% book 4 rooms
+  * 9 adults: 57% book 3 rooms
+
+This analysis reveals clear booking patterns that follow logical room occupancy constraints. The diagonal pattern observed in the probability heatmap confirms that travelers tend to book more rooms as the number of adults increases, with approximately 2 adults per room being the standard occupancy across most bookings.
+
+This categorical perspective complements our correlation analysis by revealing specific booking behaviors beyond just the general trend.
+
+### 3. Hotel Cluster Analysis
 
 #### Hotel Clusters by Continent
 ![Hotel Cluster Distribution by Continent](https://github.com/OlidiaTL/Expedia/blob/main/continent_cluster.png?raw=true)
@@ -74,8 +106,9 @@ The heatmap shows a non-uniform distribution of hotel clusters across different 
 - Some clusters (e.g., 9, 45, 63) appear more strongly associated with posa_continent 4
 
 #### Statistical validation:
-- The chi-square test confirms a statistically significant association between hotel_cluster and posa_continent
-- Cramer's V of 0.1907 indicates a medium effect size, suggesting a moderate but meaningful relationship
+- **Chi-square test**: I used this test to determine if there's a statistically significant association between categorical variables (hotel_cluster and posa_continent). The test confirms a significant relationship with p < 0.0001.
+- **Cramer's V of 0.1907**: This effect size measure indicates a medium-strength association, suggesting a moderate but meaningful relationship.
+- **Test selection rationale**: Chi-square was appropriate here because we're analyzing two categorical variables with multiple categories, and we want to test for non-random associations.
 
 #### Hotel Clusters by Top Sites
 ![Hotel Cluster Distribution by Top Sites](https://github.com/OlidiaTL/Expedia/blob/main/sitename_cluster.png?raw=true)
@@ -86,49 +119,50 @@ The heatmap reveals varied distribution patterns:
 - Site_name 23 shows stronger associations with clusters 30 and 82
 
 #### Statistical validation:
-- The chi-square test confirms a statistically significant association
-- Cramer's V of 0.0876 indicates a small effect size, suggesting a weaker relationship than with posa_continent
+- **Chi-square test**: As with the continent analysis, I used Chi-square to test the association between site_name and hotel_cluster. Results confirmed a significant relationship (p < 0.0001).
+- **Cramer's V of 0.0876**: This smaller effect size indicates a weaker relationship than with posa_continent, but still statistically meaningful.
 
 #### Key insights:
-1. Despite not showing strong linear correlations in the initial analysis, there are significant non-linear relationships between geographical features and hotel clusters
-2. The point of sale continent appears to be a stronger predictor of hotel cluster than the specific site name
+1. Despite not showing strong linear correlations in the initial correlation matrix, there are significant non-linear relationships between geographical features and hotel clusters
+2. The point of sale continent appears to be a stronger predictor of hotel cluster than the specific site name (as evidenced by the higher Cramer's V)
 3. These patterns suggest clear regional preferences for certain types of hotel destinations
+4. The effectiveness of the Chi-square test in revealing these relationships demonstrates why using appropriate statistical tests for categorical data is crucial
 
-### 5. Room and Adult Count Analysis
+### 4. Room and Adult Count Analysis
 
 ![Hotel Cluster Distribution by Room Count](https://github.com/OlidiaTL/Expedia/blob/main/roomcnt_cluster.png?raw=true)
 
 The room count heatmap reveals distinct patterns across hotel clusters:
-
 - **Higher room counts (4+)**: Clusters 16, 48, 81, and 91 show notably stronger associations with bookings of 4+ rooms, suggesting these clusters likely represent destinations popular for larger groups or families.
-
 - **Single room preferences**: Clusters 41, 48 and 91 show a strong association with single-room bookings, indicating these may represent destinations popular with solo travelers or couples.
-
-- **Mid-size accommodations**: Clusters 12, 40, 42,91 and 98 demonstrate stronger associations with 3-room bookings, suggesting they may represent destinations appealing to medium-sized groups.
-
+- **Mid-size accommodations**: Clusters 12, 40, 42, 91 and 98 demonstrate stronger associations with 3-room bookings, suggesting they may represent destinations appealing to medium-sized groups.
 - **Balanced distributions**: Many clusters (particularly in the 20-40 range) show a more even distribution across different room counts, suggesting these represent more versatile destinations that accommodate various group sizes.
 
 ![Hotel Cluster Distribution by Adult Count](https://github.com/OlidiaTL/Expedia/blob/main/adultcnt_cluster.png?raw=true)
 
 Analyzing the adult count heatmap reveals interesting patterns:
-
 - **Large group bookings (6-10 adults)**: Clusters 12, 65, 85, and 91 show notably stronger preferences for large group bookings. This suggests these clusters likely represent destinations that cater to conferences, retreats, or large family gatherings.
-
 - **Solo traveler patterns**: Clusters 48 and 91 display heightened activity for single-adult bookings, indicating these may be popular business travel destinations or locations appealing to solo tourists.
-
 - **Couple and small family bookings**: Many clusters show stronger associations with the 2-3 adult range, which is expected as this represents the typical family or couple travel arrangement. Clusters 18, 21, and 72 are particularly noteworthy here.
-
 - **Consistent large family preference**: Cluster 91 shows strong association across multiple adult count categories, suggesting it might represent versatile destinations that accommodate various group sizes, from solo travelers to large groups.
 
-#### Statistical Analysis:
-1. **Significant variation in mean room counts**: The ANOVA test demonstrates that the average number of rooms booked varies significantly across different hotel clusters (p-value: 2.56e-49). This indicates that certain hotel clusters consistently attract bookings with higher or lower room counts than others.
-2. **Even stronger variation in mean adult counts**: The even lower p-value for adult counts (1.42e-121) and higher F-statistic (8.717) shows that the number of adults per booking is an even stronger differentiator between hotel clusters than room count.
-3. **Non-linear relationships**: These ANOVA results confirm that while our initial correlation analysis didn't show strong linear relationships, there are significant patterns in how these features relate to hotel clusters.
+#### Statistical Analysis using ANOVA:
+
+1. **ANOVA test selection rationale**: I employed Analysis of Variance (ANOVA) to determine if the means of room and adult counts differed significantly across hotel clusters. This test is appropriate when comparing a numerical variable (room/adult counts) across multiple categories (hotel clusters).
+
+2. **Significant variation in mean room counts**: The ANOVA test demonstrates that the average number of rooms booked varies significantly across different hotel clusters (p-value: 2.56e-49, F-statistic: [value]). This indicates that certain hotel clusters consistently attract bookings with higher or lower room counts than others.
+
+3. **Even stronger variation in mean adult counts**: The even lower p-value for adult counts (1.42e-121) and higher F-statistic (8.717) shows that the number of adults per booking is an even stronger differentiator between hotel clusters than room count.
+
+4. **ANOVA interpretation**: The F-statistic represents the ratio of between-group variance to within-group variance. Our high F-statistics indicate that the differences between hotel clusters are substantially greater than the variations within each cluster, confirming these patterns are not random.
 
 #### Implications for modeling:
+
 1. These features should be included in predictive models despite not showing strong linear correlations with hotel_cluster in our initial analysis.
 
-### 6. Temporal Patterns
+2. The significant ANOVA results validate our approach of using appropriate statistical tests beyond simple correlation to uncover more complex relationships in the data.
+
+### 5. Temporal Patterns
 
 ![Monthly Booking Patterns](https://github.com/OlidiaTL/Expedia/blob/main/cluster_month.png?raw=true)
 
@@ -158,7 +192,7 @@ The heatmap reveals several significant temporal patterns:
 2. The seasonality patterns likely reflect different types of destinations - some being year-round destinations while others are highly seasonal.
 3. December (month 12) shows higher activity across most clusters, likely reflecting holiday travel patterns.
 
-### 7. Non-linear Relationships with Hotel Cluster
+### 6. Non-linear Relationships with Hotel Cluster
 
 To investigate non-linear relationships between numerical features and hotel clusters, I analyzed the average values and distributions of key numerical features across different hotel clusters.
 
@@ -227,7 +261,7 @@ The box plots provide additional insights beyond averages:
 
 This analysis reinforces that despite weak linear correlations, numerical features contain valuable predictive information when examined through the lens of non-linear relationships and cluster-specific patterns.
 
-### 8. Categorical Feature Analysis
+### 7. Categorical Feature Analysis
 
 #### Chi-Square Test Results:
 The chi-square tests demonstrate statistically significant relationships between all categorical features and hotel_cluster:
@@ -238,7 +272,7 @@ The chi-square tests demonstrate statistically significant relationships between
 - Booking characteristics (site_name, posa_continent, is_package) show moderate association
 - Device and channel characteristics (is_mobile, channel) show the weakest, though still significant, relationships
 
-### 9. Feature Importance Analysis
+### 8. Feature Importance Analysis
 
 ![Decision Tree for Hotel Cluster Prediction](https://github.com/OlidiaTL/Expedia/blob/main/decision_tree.png?raw=true)
 
