@@ -9,70 +9,37 @@ This project analyzes hotel booking data to predict which hotel cluster a user i
 
 ![CorrelationMatrix](https://github.com/OlidiaTL/Expedia/blob/main/matrix.png?raw=true)
 
-Strong positive correlation between srch_adults_cnt and srch_rm_cnt (0.52): This is the most significant relationship in the matrix, indicating that as the number of adults increases, travelers tend to book more rooms. This moderate correlation suggests a clear pattern in booking behavior.
+Strong positive correlation between `srch_adults_cnt` and `srch_rm_cnt` (0.52): This is the most significant relationship in the matrix, indicating that as the number of adults increases, travelers tend to book more rooms. This moderate correlation suggests a clear pattern in booking behavior.
 
-Weak positive correlation between srch_adults_cnt and srch_children_cnt (0.12): There's a slight tendency for bookings with more adults to also include more children, though this relationship is quite weak.
-Weak positive correlation between srch_children_cnt and srch_rm_cnt (0.09): The number of children has a small but positive relationship with the number of rooms booked.
+Weak positive correlation between `srch_adults_cnt` and `srch_children_cnt` (0.12): There's a slight tendency for bookings with more adults to also include more children, though this relationship is quite weak.
+Weak positive correlation between `srch_children_cnt` and `srch_rm_cnt` (0.09): The number of children has a small but positive relationship with the number of rooms booked.
 
-Minimal correlation between orig_destination_distance and other variables: The physical distance between hotels and customers shows very weak negative correlations with the number of adults (-0.06), children (-0.07), and rooms (-0.04), suggesting distance has little influence on party size.
-
-Negligible correlation between cnt (number of similar events) and all other variables: This suggests that the frequency of similar session events doesn't meaningfully relate to the booking characteristics.
+Minimal correlation between `orig_destination_distance` and other variables: The physical distance between hotels and customers shows very weak negative correlations with the number of adults (-0.06), children (-0.07), and rooms (-0.04), suggesting distance has little influence on party size.
 
 Absence of multicollinearity: Besides the adults-rooms relationship, there are no other strong correlations between features, which is favorable for potential predictive modeling as it reduces redundancy in the feature set.
 
-These findings suggest that the number of adults is the primary driver of room bookings, while other numerical variables show minimal relationships with each other.RetryClaude can make mistakes. Please double-check responses.
+These findings suggest that the number of adults is the primary driver of room bookings, while other numerical variables show minimal relationships with each other.
 
 ### 2. Relationship Between Room and Adult Counts
 
 ![Relationship Between Number of Adults and Number of Rooms](https://github.com/OlidiaTL/Expedia/blob/main/srchrm_srchadults.png?raw=true)
 ![Distribution of Adults per Room](https://github.com/OlidiaTL/Expedia/blob/main/adultscnt_srchrmcnt.png?raw=true)
 
-## Correlation Analysis and Statistical Testing
-
-### Initial Correlation Matrix
-The correlation matrix of numerical variables revealed only one moderate correlation between `srch_adults_cnt` and `srch_rm_cnt` (0.52). Other variables showed minimal correlation with each other, indicating low multicollinearity in the feature set.
-
-### Correlation Analysis
+#### Correlation Analysis
 To verify the correlation between the number of adults and number of rooms booked, I conducted both visual and statistical analyses:
-- The scatter plot shows a clear positive relationship between the number of adults and rooms
+- The scatter plot shows a clear positive relationship between the number of adults and rooms. We could see distinct patterns of clustering rather than a smooth spread of points. This makes sense since we're dealing with whole numbers (you can't book 2.5 rooms or have 3.7 adults).
 - The histogram of adults per room shows that most bookings have 1-2 adults per room, with the highest frequency around 2 adults per room
-- **Pearson correlation of 0.5206**: This indicates a moderate positive linear relationship between number of adults and number of rooms.
+- **Pearson correlation of 0.5206**: This indicates a moderate positive linear relationship between number of adults and number of rooms. 
 - **Spearman correlation of 0.4415**: The slightly lower Spearman coefficient suggests that the relationship has some non-linear components or contains outliers.
-- **Test selection rationale**: I used Pearson correlation to measure the linear relationship, while Spearman rank correlation provided a complementary non-parametric perspective that's more robust against outliers and doesn't assume linearity. Using both tests strengthens our confidence in the relationship, as they measure different aspects of correlation.
+- **Test selection rationale**: I employed both Pearson and Spearman correlation methods to provide complementary insights. Pearson correlation quantifies the strength of strictly linear relationships by comparing actual values, ideal for detecting if adult count and room count increase proportionally at a constant rate. Spearman rank correlation transforms the data into ranks before comparison, making it robust against outliers and capable of detecting any monotonic relationship (consistently increasing or decreasing, but not necessarily at a constant rate). This dual approach is particularly valuable for our discrete count variables (adults and rooms), which may not perfectly satisfy normality assumptions and likely have a relationship that isn't purely linear – as confirmed by the different coefficients obtained (Pearson: 0.5206, Spearman: 0.4415).
 - **p-values of 0.0000000000**: The extremely low p-values for both tests confirm that the correlation is statistically significant and not due to random chance.
 - **R² of 0.2710**: This means that 27.1% of the variance in one variable is explained by the other. While significant, this also indicates that the variables contain substantial unique information not captured by the other.
-
-### Categorical Analysis
-I performed categorical analysis on the relationship between adults and rooms using cross-tabulation:
-- **Cross-tabulation results**: The contingency table revealed specific booking patterns, such as 98% of 2-adult bookings requesting a single room, while 65% of 4-adult bookings request two rooms.
-- **Chi-square test**: With a chi-square statistic of 106,837.68 (p < 0.0000000001), we can conclusively reject the null hypothesis of independence between these variables.
-- **Conditional probability analysis**: The heatmap of conditional probabilities showed a clear diagonal trend, confirming that as the number of adults increases, travelers tend to book more rooms in a predictable pattern.
-
-### Relationship with Hotel Clusters
-To understand how room and adult counts relate to our target variable:
-- **Created categorical bins** for room count and adult count to improve visualization
-- **Cross-tabulation heatmaps** showed distinct preferences for certain hotel clusters based on group size
-- **ANOVA tests**: Confirmed statistically significant differences in mean room counts and adult counts across hotel clusters (p < 0.05)
-
-### Temporal Analysis
-I examined temporal patterns by creating derived features:
-- Trip duration (stay length)
-- Check-in month and day of week
-- Weekend vs. weekday patterns
-- Seasonal preferences by hotel cluster
-
-The ANOVA test confirmed significant differences in trip duration across hotel clusters (p < 0.05), indicating that different hotel clusters cater to different types of stays.
-
-### Systematic Chi-Square Testing
-I developed a function to systematically test all categorical features:
-- Ranked all categorical features by chi-square value to identify strongest predictors
-- Found that location-based features (`hotel_country`, `hotel_market`) and search features (`srch_destination_id`) had the strongest associations with hotel clusters
-- These results provided a data-driven approach to feature selection
 
 ![Frequncy](https://github.com/OlidiaTL/Expedia/blob/main/frequency_adltvsroom.png?raw=true)
 ![Probability](https://github.com/OlidiaTL/Expedia/blob/main/probability.png?raw=true)
 
-### Cross-Tabulation Analysis of Adults and Rooms
+#### Cross-Tabulation Analysis of Adults and Rooms
+While correlation is powerful for continuous data, our variables are actually discrete counts - people book whole numbers of rooms for whole numbers of adults. This discrete nature led me to use categorical analysis techniques.
 
 I performed a detailed cross-tabulation analysis of the relationship between number of adults and number of rooms to understand booking patterns:
 
@@ -81,6 +48,18 @@ I performed a detailed cross-tabulation analysis of the relationship between num
 - **Second most common**: 1 adult in 1 room (19,935 bookings), typical of solo travelers
 - **Group travel patterns**: As group size increases (4+ adults), the distribution shifts toward multiple rooms
 - **Unusual bookings**: Some unusual combinations exist, such as 8 adults in 8 rooms or 0 adults with rooms booked
+    
+#### Statistical Analysis:
+I selected the Chi-square test of independence to determine whether there is a statistically significant relationship between the number of adults and the number of rooms. This test is appropriate because:
+  * Both variables are categorical
+  * I needed to assess if these variables are independent or associated
+  * The test evaluates whether the observed frequencies differ significantly from what would be expected if there was no relationship
+
+#### Statistical Findings:
+
+The extremely high Chi-square value (106,837.68) and p-value of essentially zero (p < 0.0000000001) provide overwhelming evidence to reject the null hypothesis of independence.
+This confirms that the number of adults and number of rooms are strongly associated, which is expected but important to verify statistically.
+The large degrees of freedom (72) reflect the number of possible combinations in our data
 
 #### Probability Analysis:
 - **Solo travelers (1 adult)**: 99% book exactly 1 room
@@ -92,8 +71,10 @@ I performed a detailed cross-tabulation analysis of the relationship between num
   * 8 adults: 48% book 4 rooms
   * 9 adults: 57% book 3 rooms
 
+#### Conclusion
 This analysis reveals clear booking patterns that follow logical room occupancy constraints. The diagonal pattern observed in the probability heatmap confirms that travelers tend to book more rooms as the number of adults increases, with approximately 2 adults per room being the standard occupancy across most bookings.
 
+The statistical significance confirmed by the Chi-square test validates that these patterns are not random and provides a solid foundation for incorporating adult-room relationships into predictive models for hotel recommendations.
 This categorical perspective complements our correlation analysis by revealing specific booking behaviors beyond just the general trend.
 
 ### 3. Hotel Cluster Analysis
