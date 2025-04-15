@@ -47,7 +47,6 @@ I performed a detailed cross-tabulation analysis of the relationship between num
 - **Most common booking pattern**: 2 adults in 1 room (64,927 bookings), representing the typical couple or business travel scenario
 - **Second most common**: 1 adult in 1 room (19,935 bookings), typical of solo travelers
 - **Group travel patterns**: As group size increases (4+ adults), the distribution shifts toward multiple rooms
-- **Unusual bookings**: Some unusual combinations exist, such as 8 adults in 8 rooms or 0 adults with rooms booked
     
 #### Statistical Analysis:
 I selected the Chi-square test of independence to determine whether there is a statistically significant relationship between the number of adults and the number of rooms. This test is appropriate because:
