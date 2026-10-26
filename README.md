@@ -274,15 +274,15 @@ The chi-square tests demonstrate statistically significant relationships between
 3. The importance of is_package confirms our observation from the categorical analysis that package vs. non-package bookings show distinctly different hotel cluster preferences.
 
 ## Methodology
-Based on the exploratory data analysis, I determined that tree-based ensemble methods would be most appropriate for this prediction task given the non-linear relationships identified. The model development process included:
+Based on the exploratory analysis, I tested two classification approaches:
 
-1. Feature selection based on statistical significance and feature importance scores
-2. Feature engineering, particularly for time-based and geographical features
-3. Model training using gradient boosting techniques
-4. Hyperparameter tuning to optimize prediction accuracy
+1. Feature selection guided by chi-square tests, ANOVA and the correlation analysis above
+2. Time-based feature engineering (month and seasonality of check-in)
+3. A logistic regression model as a baseline
+4. A decision tree classifier, used both for prediction and to rank feature importance
 
 ## Results
-The final model achieved strong predictive performance, with geographic features and booking characteristics providing the most predictive power. The top 5 features (posa_continent, srch_adults_cnt, is_package, user_location_country, and site_name) together provided the majority of the model's predictive capability.
+The decision tree's feature importances agreed with the statistical tests: geographic features and booking characteristics carried the most predictive signal. The top five features were posa_continent, srch_adults_cnt, is_package, user_location_country and site_name.
 
 ## Conclusion
 This analysis demonstrates the importance of exploring non-linear relationships and feature interactions in predictive modeling. While initial correlation analysis showed limited linear relationships with the target variable, deeper statistical analysis revealed significant patterns that could be leveraged for prediction.
