@@ -291,7 +291,7 @@ Key findings:
 1. Geographic features (where users are booking from and where they're going) are the strongest predictors of hotel cluster preferences
 2. Booking characteristics (package status, number of adults) provide substantial additional predictive power
 3. Time-based patterns, particularly seasonality, show significant associations with hotel clusters
-4. Tree-based models are well-suited to capture the complex, non-linear relationships in this data
+4. Tree-based models appear well-suited to capture the complex, non-linear relationships in this data
 
 This project provides valuable insights for travel booking platforms looking to improve their recommendation systems by better understanding the factors that influence user preferences for different types of hotel destinations.
 
